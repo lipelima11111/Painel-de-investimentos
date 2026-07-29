@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel de Investimentos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#128200;</text></svg>">
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo__marca">
+    <span class="topo__logo" aria-hidden="true"></span>
+    <div>
+      <h1>Painel de Investimentos</h1>
+      <p class="topo__sub">Renda fixa brasileira &middot; taxas oficiais do Banco Central</p>
+    </div>
+  </div>
+
+  <div class="taxas" id="taxas" aria-live="polite"></div>
+
+  <div class="topo__acoes">
+    <button class="botao botao--fantasma" id="btn-ocultar" title="Ocultar valores da carteira (Shift+H)">Ocultar valores</button>
+    <button class="botao botao--fantasma" id="btn-atualizar" title="Rebuscar as taxas no BACEN">
+      <span class="ico" aria-hidden="true">&#8635;</span> Atualizar taxas
+    </button>
+    <button class="botao botao--fantasma botao--icone" id="btn-tema" title="Alternar tema" aria-label="Alternar tema claro/escuro">
+      <span aria-hidden="true">&#9680;</span>
+    </button>
+  </div>
+</header>
+
+<main class="conteudo">
+
+  <!-- ------------------------------------------------------------ KPIs -->
+  <section class="kpis" id="kpis" aria-label="Resumo da carteira"></section>
+
+  <div id="alertas" class="alertas"></div>
+
+  <!-- ------------------------------------------------------------ abas -->
+  <nav class="abas" role="tablist" aria-label="Secoes do painel">
+    <button class="aba aba--ativa" role="tab" aria-selected="true"  aria-controls="painel-carteira"  data-aba="carteira" tabindex="0">Carteira</button>
+    <button class="aba"            role="tab" aria-selected="false" aria-controls="painel-projecao"  data-aba="projecao" tabindex="-1">Projecao</button>
+    <button class="aba"            role="tab" aria-selected="false" aria-controls="painel-simulador" data-aba="simulador" tabindex="-1">Simulador</button>
+    <button class="aba"            role="tab" aria-selected="false" aria-controls="painel-ajuda"     data-aba="ajuda" tabindex="-1">Como funciona</button>
+  </nav>
+
+  <!-- ======================================================== CARTEIRA -->
+  <section class="painel painel--ativo" id="painel-carteira" role="tabpanel">
+
+    <div class="grade grade--2-1">
+      <article class="cartao">
+        <header class="cartao__topo">
+          <div>
+            <h2>Evolucao da carteira</h2>
+            <p class="cartao__nota">Quanto voce colocou e quanto os juros acrescentaram, dia a dia.</p>
+          </div>
+          <div class="legenda" id="legenda-evolucao"></div>
+        </header>
+        <div class="grafico" id="g-evolucao" data-vazio="Cadastre um investimento para ver a evolucao."></div>
+      </article>
+
+      <article class="cartao">
+        <header class="cartao__topo">
+          <div>
+            <h2>Onde esta o dinheiro</h2>
+            <p class="cartao__nota">Por tipo de produto.</p>
+          </div>
+        </header>
+        <div class="grafico grafico--rosca" id="g-alocacao" data-vazio="Sem dados."></div>
+        <div class="legenda legenda--lista" id="legenda-alocacao"></div>
+      </article>
+    </div>
+
+    <article class="cartao">
+      <header class="cartao__topo">
+        <div>
+          <h2>Concentracao por indexador</h2>
+          <p class="cartao__nota">Quanto da carteira depende do CDI, do IPCA, de prefixado etc.</p>
+        </div>
+      </header>
+      <div class="grafico grafico--faixa" id="g-indexadores" data-vazio="Sem dados."></div>
+      <div class="legenda legenda--lista" id="legenda-indexadores"></div>
+    </article>
+
+    <article class="cartao" id="secao-vencimentos" hidden>
+      <header class="cartao__topo">
+        <div>
+          <h2>Quando o dinheiro volta</h2>
+          <p class="cartao__nota">Linha do tempo dos vencimentos cadastrados.</p>
+        </div>
+      </header>
+      <div class="grafico grafico--timeline" id="g-vencimentos" data-vazio="Sem vencimentos cadastrados."></div>
+    </article>
+
+    <article class="cartao">
+      <header class="cartao__topo">
+        <div>
+          <h2>Meus investimentos</h2>
+          <p class="cartao__nota">Valores liquidos, ja descontando IR, IOF e taxa de custodia.</p>
+        </div>
+        <button class="botao botao--principal" id="btn-novo">+ Novo investimento</button>
+      </header>
+      <div class="tabela-rolagem">
+        <table class="tabela tabela--investimentos" id="tabela-investimentos">
+          <thead>
+            <tr>
+              <th data-ordenar="nome">Investimento</th>
+              <th>Indexador</th>
+              <th class="num" data-ordenar="principal">Aplicado</th>
+              <th class="num" data-ordenar="bruto">Bruto hoje</th>
+              <th class="num" data-ordenar="impostos">IR + IOF</th>
+              <th class="num" data-ordenar="liquido">Liquido hoje</th>
+              <th class="num" data-ordenar="rendimento_dia">Rende/dia</th>
+              <th class="num" data-ordenar="rentabilidade">Rentab.</th>
+              <th class="acoes"><span class="oculto">Acoes</span></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot></tfoot>
+        </table>
+      </div>
+      <p class="vazio" id="vazio-tabela" hidden>
+        Nenhum investimento cadastrado ainda. Clique em <strong>+ Novo investimento</strong> para comecar.
+      </p>
+    </article>
+  </section>
+
+  <!-- ======================================================== PROJECAO -->
+  <section class="painel" id="painel-projecao" role="tabpanel">
+    <article class="cartao">
+      <header class="cartao__topo">
+        <div>
+          <h2>Quanto vou ter no futuro</h2>
+          <p class="cartao__nota">
+            Historico com as taxas que de fato ocorreram; do ponto <strong>Hoje</strong> em diante,
+            projecao com o CDI/Selic (ajustados pelo cenario) e o IPCA esperado pelo boletim Focus.
+          </p>
+        </div>
+        <div class="cartao__controles">
+          <label class="campo campo--inline">
+            <span>Horizonte</span>
+            <select id="sel-anos">
+              <option value="1">1 ano</option>
+              <option value="2">2 anos</option>
+              <option value="5" selected>5 anos</option>
+              <option value="10">10 anos</option>
+              <option value="20">20 anos</option>
+              <option value="30">30 anos</option>
+            </select>
+          </label>
+          <label class="campo campo--inline">
+            <span>Cenario</span>
+            <select id="sel-cenario"></select>
+          </label>
+        </div>
+      </header>
+      <div class="grafico grafico--alto" id="g-projecao" data-vazio="Cadastre um investimento para projetar."></div>
+      <div class="legenda" id="legenda-projecao"></div>
+    </article>
+
+    <article class="cartao">
+      <header class="cartao__topo">
+        <div>
+          <h2>Marcos ano a ano</h2>
+          <p class="cartao__nota">Valor liquido estimado ao fim de cada ano.</p>
+        </div>
+      </header>
+      <div class="grafico" id="g-marcos" data-vazio="Cadastre um investimento para projetar."></div>
+      <div class="legenda" id="legenda-marcos"></div>
+      <div class="tabela-rolagem">
+        <table class="tabela" id="tabela-marcos">
+          <thead>
+            <tr>
+              <th>Daqui a</th><th>Data</th>
+              <th class="num">Total aportado</th>
+              <th class="num">Juros acumulados</th>
+              <th class="num">Patrimonio liquido</th>
+              <th class="num">Juros / aportado</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <!-- ======================================================= SIMULADOR -->
+  <section class="painel" id="painel-simulador" role="tabpanel">
+    <article class="cartao">
+      <header class="cartao__topo">
+        <div>
+          <h2>Comparar produtos</h2>
+          <p class="cartao__nota">
+            Mesmo dinheiro, mesmo prazo, produtos diferentes. O simulador desconta IR e IOF
+            de cada um &mdash; e por isso que um LCI de 95% do CDI pode ganhar de um CDB de 110%.
+          </p>
+        </div>
+      </header>
+
+      <form class="form-sim" id="form-simulador">
+        <div class="form-sim__topo">
+          <label class="campo">
+            <span>Valor inicial</span>
+            <input type="number" id="sim-valor" value="10000" min="1" step="100" required>
+          </label>
+          <label class="campo">
+            <span>Aporte mensal</span>
+            <input type="number" id="sim-aporte" value="0" min="0" step="100">
+          </label>
+          <label class="campo">
+            <span>Prazo (meses)</span>
+            <input type="number" id="sim-prazo" value="24" min="1" max="600" step="1" required>
+          </label>
+          <button class="botao botao--principal" type="submit">Simular</button>
+        </div>
+
+        <div class="cenarios" id="cenarios"></div>
+        <button class="botao botao--fantasma" type="button" id="btn-add-cenario">+ Adicionar produto</button>
+      </form>
+
+      <div class="grafico grafico--alto" id="g-simulador" data-vazio="Preencha os produtos e clique em Simular."></div>
+      <div class="legenda" id="legenda-simulador"></div>
+
+      <div class="tabela-rolagem">
+        <table class="tabela" id="tabela-simulador">
+          <thead>
+            <tr>
+              <th>Produto</th><th>Taxa</th><th class="num">Equivale a</th>
+              <th class="num">Aportado</th><th class="num">Bruto</th>
+              <th class="num">IR + IOF</th><th class="num">Liquido</th>
+              <th class="num">Diferenca</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="cartao">
+      <header class="cartao__topo">
+        <div>
+          <h2>Isento x tributado</h2>
+          <p class="cartao__nota">Quanto uma LCI/LCA precisa pagar para empatar com um CDB.</p>
+        </div>
+      </header>
+      <form class="form-eq" id="form-equivalencia">
+        <label class="campo">
+          <span>CDB paga (% do CDI)</span>
+          <input type="number" id="eq-cdi" value="110" min="1" step="1">
+        </label>
+        <label class="campo">
+          <span>Prazo (meses)</span>
+          <input type="number" id="eq-prazo" value="24" min="1" max="600" step="1">
+        </label>
+        <button class="botao botao--principal" type="submit">Calcular</button>
+      </form>
+      <p class="resultado-eq" id="resultado-eq"></p>
+    </article>
+  </section>
+
+  <!-- =========================================================== AJUDA -->
+  <section class="painel" id="painel-ajuda" role="tabpanel">
+    <article class="cartao prosa">
+      <h2>Como o painel calcula</h2>
+
+      <h3>De onde vem cada taxa</h3>
+      <ul>
+        <li><strong>CDI diario</strong> &mdash; serie 12 do SGS/BACEN. E a taxa real de cada dia, nao uma media.</li>
+        <li><strong>Selic</strong> &mdash; series 11 (efetiva diaria) e 432 (meta do Copom).</li>
+        <li><strong>IPCA</strong> &mdash; serie 433, mes a mes.</li>
+        <li><strong>TR e poupanca</strong> &mdash; series 226 e 195, tambem historicas: cada mes usa a taxa que
+          realmente vigorou naquele mes, nao a taxa de hoje aplicada ao passado inteiro.</li>
+        <li><strong>Projecoes</strong> &mdash; boletim Focus (mediana do mercado) via API Olinda.</li>
+      </ul>
+
+      <h3>Como o rendimento e calculado</h3>
+      <ul>
+        <li>Capitalizacao em <strong>base 252 dias uteis</strong>, com o calendario de feriados bancarios (inclusive carnaval e Corpus Christi, que sao moveis).</li>
+        <li>Juros correm nos dias uteis do intervalo <em>[aplicacao, resgate)</em>: o dia da aplicacao conta, o do resgate nao.</li>
+        <li><strong>% do CDI</strong> usa a formula da B3: <code>fator = 1 + TDI &times; (p/100)</code>. Nao e <code>(1+TDI)<sup>p</sup></code>.</li>
+        <li><strong>Prefixado, CDI+, Selic+ e IPCA+</strong> capitalizam como <code>(1 + i)<sup>1/252</sup></code>.</li>
+        <li><strong>IPCA+</strong> corrige pelo IPCA do mes diluido nos dias uteis daquele mes, e soma o juro real por cima.</li>
+        <li><strong>Poupanca</strong> segue a serie historica publicada; sem dado (no futuro), aplica a regra oficial: com Selic acima de 8,5% a.a., rende 0,5% ao mes + TR, creditados so no aniversario mensal.</li>
+        <li>No <strong>passado</strong> usamos as taxas que realmente ocorreram; no <strong>futuro</strong>, o CDI/Selic esperados (ajustaveis por um cenario de choque) e o IPCA do Focus.</li>
+      </ul>
+
+      <h3>Impostos e taxas</h3>
+      <ul>
+        <li><strong>IR regressivo</strong> sobre o rendimento: 22,5% ate 180 dias, 20% ate 360, 17,5% ate 720, 15% acima disso.</li>
+        <li><strong>IOF</strong> em resgates com menos de 30 dias, pela tabela regressiva oficial (96% no 1&ordm; dia ate 0% no 30&ordm;).</li>
+        <li><strong>Isentos de IR</strong>: LCI, LCA, LIG, CRI, CRA, debentures incentivadas e poupanca.</li>
+        <li><strong>Custodia da B3</strong> de 0,20% a.a. no Tesouro Direto. A isencao sobre os primeiros R$ 10.000 e por conta na B3, nao por titulo &mdash; quem tem mais de um Tesouro Selic divide o beneficio entre eles.</li>
+        <li><strong>Come-cotas</strong> de 15% no ultimo dia util de maio e novembro nos fundos de renda fixa, com o credito rateado entre os aportes pelo rendimento de cada um.</li>
+        <li>Com aportes mensais, cada aporte e um lote com <strong>prazo e aliquota proprios</strong> &mdash; o painel calcula lote a lote.</li>
+        <li><strong>Resgates</strong> (parciais ou totais) consomem os lotes mais antigos primeiro e realizam o IR/IOF na data do resgate.</li>
+      </ul>
+
+      <h3>Comparando com o mercado</h3>
+      <ul>
+        <li>O KPI <strong>"Desempenho vs. CDI"</strong> usa a taxa interna de retorno (XIRR) do fluxo de caixa real da carteira &mdash; aportes, resgates e saldo atual &mdash; anualizada e comparada ao CDI acumulado no mesmo periodo. E a metrica correta quando ha aportes mensais; a rentabilidade simples (rendimento &divide; aportado) mistura dinheiro que ficou anos com dinheiro que entrou mes passado.</li>
+      </ul>
+
+      <h3>Limites que voce deve conhecer</h3>
+      <ul>
+        <li>Titulos prefixados e IPCA+ sao calculados <strong>na curva</strong> (carregando ate o vencimento). Nao ha marcacao a mercado, entao o painel nao mostra a oscilacao de preco de quem vende antes.</li>
+        <li>O IPCA e aplicado sem a defasagem de 15 dias que a NTN-B real usa.</li>
+        <li>Projecoes assumem taxas constantes (ajustadas apenas pelo cenario escolhido). Use os numeros como ordem de grandeza, nao como promessa.</li>
+        <li>O <strong>FGC</strong> cobre R$ 250 mil por CPF e por instituicao; o painel avisa quando voce passa desse teto.</li>
+      </ul>
+    </article>
+  </section>
+</main>
+
+<!-- ================================================= MODAL DE CADASTRO -->
+<dialog class="modal" id="modal-investimento">
+  <form method="dialog" class="modal__form" id="form-investimento">
+    <header class="modal__topo">
+      <h2 id="modal-titulo">Novo investimento</h2>
+      <button type="button" class="botao botao--icone botao--fantasma" id="btn-fechar" aria-label="Fechar">&times;</button>
+    </header>
+
+    <div class="modal__corpo">
+      <p class="erro" id="erro-form" hidden></p>
+
+      <label class="campo campo--largo">
+        <span>Nome <em>*</em></span>
+        <input type="text" name="nome" required maxlength="120" placeholder="Ex.: CDB Banco X 2027">
+      </label>
+
+      <label class="campo">
+        <span>Tipo <em>*</em></span>
+        <select name="tipo" id="sel-tipo" required></select>
+      </label>
+
+      <label class="campo">
+        <span>Como rende <em>*</em></span>
+        <select name="indexador" id="sel-indexador" required></select>
+      </label>
+
+      <label class="campo">
+        <span>Taxa contratada <em>*</em></span>
+        <div class="campo__com-sufixo">
+          <input type="number" name="taxa" id="inp-taxa" step="0.01" min="0" required>
+          <span class="sufixo" id="sufixo-taxa"></span>
+        </div>
+        <small class="dica" id="dica-taxa"></small>
+      </label>
+
+      <label class="campo">
+        <span>Valor aplicado (R$) <em>*</em></span>
+        <input type="number" name="valor_aplicado" step="0.01" min="0.01" required placeholder="10000">
+      </label>
+
+      <label class="campo">
+        <span>Aporte mensal (R$)</span>
+        <input type="number" name="aporte_mensal" step="0.01" min="0" value="0">
+        <small class="dica">Opcional. Entra todo mes no mesmo dia da aplicacao.</small>
+      </label>
+
+      <label class="campo">
+        <span>Data da aplicacao <em>*</em></span>
+        <input type="date" name="data_aplicacao" required>
+      </label>
+
+      <label class="campo">
+        <span>Vencimento</span>
+        <input type="date" name="data_vencimento">
+        <small class="dica">Deixe vazio se tiver liquidez diaria.</small>
+      </label>
+
+      <label class="campo">
+        <span>Instituicao</span>
+        <div class="combo-banco" id="combo-banco">
+          <div class="combo-banco__campo">
+            <span class="combo-banco__ico" id="combo-banco-ico" hidden></span>
+            <input type="text" name="instituicao" id="inp-instituicao" maxlength="120"
+                   placeholder="Ex.: Banco Inter" autocomplete="off" role="combobox"
+                   aria-expanded="false" aria-controls="lista-bancos" aria-autocomplete="list">
+          </div>
+          <ul class="combo-banco__lista" id="lista-bancos" role="listbox" hidden></ul>
+        </div>
+        <small class="dica">Comece a digitar para ver os principais bancos e corretoras. Usado para checar o teto do FGC.</small>
+      </label>
+
+      <label class="campo campo--largo">
+        <span>Observacoes</span>
+        <textarea name="observacoes" rows="2" maxlength="500"></textarea>
+      </label>
+
+      <section class="bloco-resgates" id="bloco-resgates" hidden>
+        <h3>Resgates</h3>
+        <ul class="lista-resgates" id="lista-resgates"></ul>
+        <div class="form-resgate" id="form-resgate">
+          <label class="campo">
+            <span>Data</span>
+            <input type="date" id="resgate-data">
+          </label>
+          <label class="campo">
+            <span>Valor (R$)</span>
+            <input type="number" id="resgate-valor" step="0.01" min="0" placeholder="deixe vazio p/ total">
+          </label>
+          <button class="botao botao--fantasma" type="button" id="btn-registrar-resgate">Registrar resgate</button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="modal__rodape">
+      <button type="button" class="botao botao--fantasma" id="btn-cancelar">Cancelar</button>
+      <button type="submit" class="botao botao--principal" id="btn-salvar">Salvar</button>
+    </footer>
+  </form>
+</dialog>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite" hidden></div>
+
+<script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bancos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

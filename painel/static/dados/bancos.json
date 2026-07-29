@@ -1,0 +1,277 @@
+{
+  "bancos": [
+    {
+      "id": "agibank",
+      "nome": "Agibank",
+      "icone": "img/bancos/agibank.svg",
+      "aliases": [
+        "agibank",
+        "agi bank"
+      ]
+    },
+    {
+      "id": "bmg",
+      "nome": "Banco BMG",
+      "icone": "img/bancos/bmg.svg",
+      "aliases": [
+        "bmg",
+        "banco bmg"
+      ]
+    },
+    {
+      "id": "bb",
+      "nome": "Banco do Brasil",
+      "icone": "img/bancos/bb.svg",
+      "aliases": [
+        "banco do brasil",
+        "banco brasil",
+        "bb"
+      ]
+    },
+    {
+      "id": "inter",
+      "nome": "Banco Inter",
+      "icone": "img/bancos/inter.svg",
+      "aliases": [
+        "inter",
+        "banco inter"
+      ]
+    },
+    {
+      "id": "original",
+      "nome": "Banco Original",
+      "icone": "img/bancos/original.svg",
+      "aliases": [
+        "original",
+        "banco original"
+      ]
+    },
+    {
+      "id": "pan",
+      "nome": "Banco Pan",
+      "icone": "img/bancos/pan.svg",
+      "aliases": [
+        "pan",
+        "banco pan",
+        "panamericano",
+        "banco panamericano"
+      ]
+    },
+    {
+      "id": "safra",
+      "nome": "Banco Safra",
+      "icone": "img/bancos/safra.svg",
+      "aliases": [
+        "safra",
+        "banco safra"
+      ]
+    },
+    {
+      "id": "banrisul",
+      "nome": "Banrisul",
+      "icone": "img/bancos/banrisul.svg",
+      "aliases": [
+        "banrisul",
+        "banco do estado do rio grande do sul"
+      ]
+    },
+    {
+      "id": "bradesco",
+      "nome": "Bradesco",
+      "icone": "img/bancos/bradesco.svg",
+      "aliases": [
+        "bradesco",
+        "banco bradesco"
+      ]
+    },
+    {
+      "id": "brb",
+      "nome": "BRB - Banco de Brasilia",
+      "icone": "img/bancos/brb.svg",
+      "aliases": [
+        "brb",
+        "banco de brasilia",
+        "banco regional de brasilia"
+      ]
+    },
+    {
+      "id": "btg",
+      "nome": "BTG Pactual",
+      "icone": "img/bancos/btg.svg",
+      "aliases": [
+        "btg",
+        "btg pactual",
+        "banco btg pactual"
+      ]
+    },
+    {
+      "id": "c6",
+      "nome": "C6 Bank",
+      "icone": "img/bancos/c6.svg",
+      "aliases": [
+        "c6",
+        "c6 bank",
+        "banco c6"
+      ]
+    },
+    {
+      "id": "caixa",
+      "nome": "Caixa Economica Federal",
+      "icone": "img/bancos/caixa.svg",
+      "aliases": [
+        "caixa",
+        "caixa economica",
+        "caixa economica federal",
+        "cef"
+      ]
+    },
+    {
+      "id": "infinitepay",
+      "nome": "InfinitePay",
+      "icone": "img/bancos/infinitepay.svg",
+      "aliases": [
+        "infinitepay",
+        "infinite pay"
+      ]
+    },
+    {
+      "id": "itau",
+      "nome": "Itau Unibanco",
+      "icone": "img/bancos/itau.svg",
+      "aliases": [
+        "itau",
+        "banco itau",
+        "itau unibanco"
+      ]
+    },
+    {
+      "id": "mercadopago",
+      "nome": "Mercado Pago",
+      "icone": "img/bancos/mercadopago.svg",
+      "aliases": [
+        "mercado pago",
+        "mercadopago",
+        "mp"
+      ]
+    },
+    {
+      "id": "neon",
+      "nome": "Neon",
+      "icone": "img/bancos/neon.svg",
+      "aliases": [
+        "neon",
+        "banco neon"
+      ]
+    },
+    {
+      "id": "next",
+      "nome": "Next",
+      "icone": "img/bancos/next.svg",
+      "aliases": [
+        "next",
+        "next banco",
+        "banco next"
+      ]
+    },
+    {
+      "id": "nubank",
+      "nome": "Nubank",
+      "icone": "img/bancos/nubank.svg",
+      "aliases": [
+        "nubank",
+        "nu",
+        "nu pagamentos",
+        "nu bank"
+      ]
+    },
+    {
+      "id": "pagbank",
+      "nome": "PagBank",
+      "icone": "img/bancos/pagbank.svg",
+      "aliases": [
+        "pagbank",
+        "pagseguro",
+        "pag bank",
+        "pag seguro"
+      ]
+    },
+    {
+      "id": "picpay",
+      "nome": "PicPay",
+      "icone": "img/bancos/picpay.svg",
+      "aliases": [
+        "picpay",
+        "pic pay"
+      ]
+    },
+    {
+      "id": "santander",
+      "nome": "Santander",
+      "icone": "img/bancos/santander.svg",
+      "aliases": [
+        "santander",
+        "banco santander"
+      ]
+    },
+    {
+      "id": "sicoob",
+      "nome": "Sicoob",
+      "icone": "img/bancos/sicoob.svg",
+      "aliases": [
+        "sicoob"
+      ]
+    },
+    {
+      "id": "sicredi",
+      "nome": "Sicredi",
+      "icone": "img/bancos/sicredi.svg",
+      "aliases": [
+        "sicredi"
+      ]
+    },
+    {
+      "id": "sofisa",
+      "nome": "Sofisa Direto",
+      "icone": "img/bancos/sofisa.svg",
+      "aliases": [
+        "sofisa",
+        "sofisa direto",
+        "banco sofisa"
+      ]
+    },
+    {
+      "id": "stone",
+      "nome": "Stone",
+      "icone": "img/bancos/stone.svg",
+      "aliases": [
+        "stone",
+        "stone pagamentos"
+      ]
+    },
+    {
+      "id": "will",
+      "nome": "Will Bank",
+      "icone": "img/bancos/will.svg",
+      "aliases": [
+        "will",
+        "will bank",
+        "willbank"
+      ]
+    },
+    {
+      "id": "xp",
+      "nome": "XP Investimentos",
+      "icone": "img/bancos/xp.svg",
+      "aliases": [
+        "xp",
+        "xp investimentos",
+        "xp corretora"
+      ]
+    }
+  ],
+  "outro": {
+    "id": "outro",
+    "nome": "Outro banco",
+    "icone": "img/bancos/outro.svg"
+  }
+}
